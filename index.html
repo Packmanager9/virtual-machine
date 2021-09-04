@@ -1308,7 +1308,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
              this.running = 0
              this.ran = 0
             this.body  = new Circle(x,y, 20, getRandomColor())
-            this.name = getRandomColor()+getRandomColor()
+            this.name = "Click to  play Froggair" //getRandomColor()+getRandomColor()
             this.marked = 0
             this.gamenum = icons.length
         }
@@ -3358,8 +3358,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
     class BullFrog{
         constructor(args=0){
           if(args == 0){
+            this.type = 1
             this.flies = 0
-            this.color = getRandomColor()
+            this.color = getRandomLightColor()
             this.angle = 0
             this.body = new Circle(350, 350, 8, this.color)
             this.guide = new Circle(353, 350, 3, this.color)
@@ -3439,20 +3440,25 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             if(this.tonguedis < 3){
                 this.tonguedis = 3
+                
+            if(tadpoles.indexOf(this) == 0){
                 if(keysPressed[' '] || keysPressed['e'] || keysPressed['l']){
                     this.tonguemom = this.guidedis*5
                 }
+            }
             }
             this.tonguedis += this.tonguemom
             this.tonguedis *= .95
             this.tonguedis -= 1
             this.tonguemom *= .90
             this.body.move()
+            if(tadpoles.indexOf(this) == 0){
             if(keysPressed['w'] || !water.isPointInside(this.body)){
                 if(keysPressed['w']){
                     this.timeratio = .92 + ((Math.cos(this.spindle))*.15)
                     this.spindle+=.1
                 }
+            }
             }
             if( !water.isPointInside(this.body)){
                 this.body.ymom += .08
@@ -3486,18 +3492,24 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.leg3x.y =  this.body.y-(Math.sin(this.angle-(Math.PI*(.9*(this.timeratio*this.timeratio))))*this.guidedis*6)
             this.leg4x.x =  this.body.x-(Math.cos(this.angle+(Math.PI*(.9*(this.timeratio*this.timeratio))))*this.guidedis*6)
             this.leg4x.y =this.body.y- (Math.sin(this.angle+(Math.PI*(.9*(this.timeratio*this.timeratio))))*this.guidedis*6)
+
+
+            if(tadpoles.indexOf(this) == 0){
             if(keysPressed['d']){
                 this.angle+=.055
             }
             if(keysPressed['a']){
                 this.angle-=.055
             }
-
+            }
             if(keysPressed['w'] && water.isPointInside(this.body)){
+
+            if(tadpoles.indexOf(this) == 0){
                 this.combo = 0
                 this.scores = []
             this.body.xmom = (this.body.xmom*.95)+(((this.guide.x-this.body.x)*1.45)*.07)
             this.body.ymom = (this.body.ymom*.95)+(((this.guide.y-this.body.y)*1.45)*.07)
+            }
             }else{
                 if(water.isPointInside(this.body)){
                     this.body.xmom*=.98
@@ -3603,7 +3615,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     
     class GlideFrog{
-        constructor(){
+        constructor(args = 0){
+          if(args == 0){
+
+            this.type = 2
             this.flies = 0
             this.color = getRandomColor()
             this.angle = 0
@@ -3639,6 +3654,45 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.scale = 1
             this.scores = []
             this.score = 0
+
+          }else{
+
+            this.flies = args.flies
+            this.color = args.color
+            this.angle = args.angle
+            this.body = new Circle(args.x, args.y, 4, args.color)
+            this.guide = new Circle(353, 350, 3, this.color)
+            this.tongue = new Circle(353, 350, 3, args.tonguecolor)
+            this.guidedis = 3
+            this.links = []
+            this.eye1 = new Circle(350,350, 1.1, 'black')
+            this.eye2 = new Circle(350,350, 1.1, 'black')
+            this.leg1 = new Circle(350,350, 3, this.color)
+            this.leg2 = new Circle(350,350, 3, this.color)
+            this.leg1x = new Circle(350,350, 5, this.color)
+            this.leg2x = new Circle(350,350, 5, this.color)
+            this.leg1link = new LineOP(this.body,this.leg1, this.color, 4)
+            this.leg2link = new LineOP(this.body,this.leg2,this.color, 4)
+            this.leg1xlink = new LineOP(this.leg1x,this.leg1,this.color, 3.5)
+            this.leg2xlink = new LineOP(this.leg2x,this.leg2, this.color, 3.5)
+            this.leg3 = new Circle(350,350, 3, this.color)
+            this.leg4 = new Circle(350,350, 3, this.color)
+            this.leg3x = new Circle(350,350, 5, this.color)
+            this.leg4x = new Circle(350,350, 5, this.color)
+            this.leg3link = new LineOP(this.body,this.leg3, this.color, 5)
+            this.leg4link = new LineOP(this.body,this.leg4,this.color, 5)
+            this.leg3xlink = new LineOP(this.leg3x,this.leg3,this.color, 3.5)
+            this.leg4xlink = new LineOP(this.leg4x,this.leg4, this.color, 3.5)
+            this.tonguelink = new LineOP(this.body,this.tongue, this.tongue.color, 2.5)
+            this.combo = 0
+            this.spindle = args.spindle
+            this.timeratio = args.timeratio
+            this.tonguedis = args.tonguedis
+            this.tonguemom = 0
+            this.scale = 1
+            this.scores = []
+            this.score = 0
+          }
         }
         draw(){
             for(let t = 0;t<this.scores.length;t++){
@@ -3771,29 +3825,81 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.scores.push(new Text(fly.body.x, fly.body.y, this.combo))
             flies.splice(t,1)
             if(this.body.radius < 30){
-                this.guidedis= (this.flies*.12345)*.31
-                this.body.radius= (this.flies*.12345)*.28
-                this.eye2.radius= (this.flies*.12345)*.03
-                this.eye1.radius= (this.flies*.12345)*.03
-                this.leg1.radius= (this.flies*.12345)*.15
-                this.leg2.radius= (this.flies*.12345)*.15
-                this.leg3.radius= (this.flies*.12345)*.15
-                this.leg4.radius= (this.flies*.12345)*.15
-                this.leg1x.radius= (this.flies*.12345)*.19
-                this.leg2x.radius= (this.flies*.12345)*.19
-                this.leg3x.radius= (this.flies*.12345)*.19
-                this.leg4x.radius= (this.flies*.12345)*.19
-                this.tongue.radius= (this.flies*.12345)*.19
+
+
+
+
+
+
+
+            this.flies = 0
+            this.color = getRandomColor()
+            this.angle = 0
+            this.body = new Circle(350, 350, 4, this.color)
+            this.guide = new Circle(353, 350, 3, this.color)
+            this.tongue = new Circle(353, 350, 3, getRandomColor())
+            this.guidedis = 3
+            this.links = []
+            this.eye1 = new Circle(350,350, 1.1, 'black')
+            this.eye2 = new Circle(350,350, 1.1, 'black')
+            this.leg1 = new Circle(350,350, 3, this.color)
+            this.leg2 = new Circle(350,350, 3, this.color)
+            this.leg1x = new Circle(350,350, 5, this.color)
+            this.leg2x = new Circle(350,350, 5, this.color)
+            this.leg1link = new LineOP(this.body,this.leg1, this.color, 4)
+            this.leg2link = new LineOP(this.body,this.leg2,this.color, 4)
+            this.leg1xlink = new LineOP(this.leg1x,this.leg1,this.color, 3.5)
+            this.leg2xlink = new LineOP(this.leg2x,this.leg2, this.color, 3.5)
+            this.leg3 = new Circle(350,350, 3, this.color)
+            this.leg4 = new Circle(350,350, 3, this.color)
+            this.leg3x = new Circle(350,350, 5, this.color)
+            this.leg4x = new Circle(350,350, 5, this.color)
+            this.leg3link = new LineOP(this.body,this.leg3, this.color, 5)
+            this.leg4link = new LineOP(this.body,this.leg4,this.color, 5)
+            this.leg3xlink = new LineOP(this.leg3x,this.leg3,this.color, 3.5)
+            this.leg4xlink = new LineOP(this.leg4x,this.leg4, this.color, 3.5)
+            this.tonguelink = new LineOP(this.body,this.tongue, this.tongue.color, 2.5)
+            this.combo = 0
+            this.spindle = 1
+            this.timeratio = .95
+            this.tonguedis = 2.9
+            this.tonguemom = 0
+            this.scale = 1
+            this.scores = []
+            this.score = 0
+
+
+
+
+
+
+
+
+
+
+                this.guidedis=3+ (this.flies*.12345)*.31
+                this.body.radius=4+ (this.flies*.12345)*.28
+                this.eye2.radius=1.1+ (this.flies*.12345)*.03
+                this.eye1.radius=1.1+ (this.flies*.12345)*.03
+                this.leg1.radius=3+ (this.flies*.12345)*.15
+                this.leg2.radius=3+ (this.flies*.12345)*.15
+                this.leg3.radius=3+ (this.flies*.12345)*.15
+                this.leg4.radius=3+ (this.flies*.12345)*.15
+                this.leg1x.radius=5+ (this.flies*.12345)*.19
+                this.leg2x.radius=5+ (this.flies*.12345)*.19
+                this.leg3x.radius=5+ (this.flies*.12345)*.19
+                this.leg4x.radius=5+ (this.flies*.12345)*.19
+                this.tongue.radius=3+ (this.flies*.12345)*.19
     
-                this.leg1link.width = (this.flies*.12345)* .22
-                this.leg2link.width = (this.flies*.12345)* .22
-                this.leg2xlink.width = (this.flies*.12345)* .22
-                this.leg1xlink.width = (this.flies*.12345)* .22
+                this.leg1link.width =5+ (this.flies*.12345)* .22
+                this.leg2link.width =5+ (this.flies*.12345)* .22
+                this.leg2xlink.width =3.5+ (this.flies*.12345)* .22
+                this.leg1xlink.width =3.5+ (this.flies*.12345)* .22
     
-                this.leg3link.width = (this.flies*.12345)* .22
-                this.leg4link.width = (this.flies*.12345)* .22
-                this.leg3xlink.width = (this.flies*.12345)* .22
-                this.leg4xlink.width = (this.flies*.12345)* .22
+                this.leg3link.width =5+ (this.flies*.12345)* .22
+                this.leg4link.width =5+(this.flies*.12345)* .22
+                this.leg3xlink.width =3.5+ (this.flies*.12345)* .22
+                this.leg4xlink.width =3.5+ (this.flies*.12345)* .22
                 canvas_context.translate(tadpoles[0].body.x, tadpoles[0].body.y)
                 canvas_context.scale(1/this.scale,1/this.scale)
                 this.scale *= .9989
@@ -3868,9 +3974,13 @@ FrogSocketize(ws)
         ws.addEventListener("open", () => {
             ws.addEventListener("message", ({ data }) => {
                 if(JSON.parse(data).flies >= 0){
-                  console.log("hit")
+                  // console.log("hit")
+                  if(JSON.parse(data).type == 1){
                   tadpoles[1] = new BullFrog(JSON.parse(data))
-                  console.log(tadpoles)
+                  }else{
+                  tadpoles[1] = new GlideFrog(JSON.parse(data))
+                  }
+                  // console.log(tadpoles)
                 }
             })
 
@@ -3917,6 +4027,7 @@ FrogSocketize(ws)
                 let json ={}
                 json.x = tadpoles[0].body.x
                 json.color = tadpoles[0].color
+                json.type = tadpoles[0].type
                 json.y = tadpoles[0].body.y
                 json.angle = tadpoles[0].angle
                 json.flies = tadpoles[0].flies
@@ -5444,7 +5555,7 @@ FrogSocketize(ws)
 
 
 
-    for(let t=  0;t<5;t++){
+    for(let t=  0;t<1;t++){
         let icon = new Icon(1100, 100+t*100)
         icon.index = t
         icons.push(icon)
